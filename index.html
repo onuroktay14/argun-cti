@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -917,7 +917,6 @@
             opacity: 0.5;
         }
     </style>
-</head>
 <body>
 
 <!-- ─── Header ─── -->
@@ -936,13 +935,13 @@
             <button class="nav-btn" data-page="cve-feed">CVE Feed</button>
             <button class="nav-btn" data-page="ip-blacklist">IP Blacklist</button>
             <button class="nav-btn" data-page="analytics">Analytics</button>
-            <button class="nav-btn" data-page="about">Hakkında</button>
+            <button class="nav-btn" data-page="about">About</button>
         </nav>
 
         <div class="header-right">
             <div class="update-badge">
                 <div class="dot"></div>
-                <span id="lastUpdate">Yükleniyor...</span>
+                <span id="lastUpdate">Loading...</span>
             </div>
         </div>
     </div>
@@ -955,15 +954,15 @@
     <div class="page active" id="page-dashboard">
         <div class="stats-grid">
             <div class="stat-card total">
-                <div class="stat-label">Toplam CVE</div>
+                <div class="stat-label">Total CVEs</div>
                 <div class="stat-value" id="statTotal">—</div>
             </div>
             <div class="stat-card critical">
-                <div class="stat-label">Kritik (ATS 80+)</div>
+                <div class="stat-label">Critical (ATS 80+)</div>
                 <div class="stat-value" id="statCritical">—</div>
             </div>
             <div class="stat-card high">
-                <div class="stat-label">Yüksek (ATS 60+)</div>
+                <div class="stat-label">High (ATS 60+)</div>
                 <div class="stat-value" id="statHigh">—</div>
             </div>
             <div class="stat-card kev">
@@ -971,28 +970,28 @@
                 <div class="stat-value" id="statKev">—</div>
             </div>
             <div class="stat-card poc">
-                <div class="stat-label">Aktif Exploit/PoC</div>
+                <div class="stat-label">Active Exploits</div>
                 <div class="stat-value" id="statPoc">—</div>
             </div>
             <div class="stat-card ips">
-                <div class="stat-label">Kötücül IP</div>
+                <div class="stat-label">Malicious IPs</div>
                 <div class="stat-value" id="statIps">—</div>
             </div>
         </div>
 
         <div class="charts-grid">
             <div class="chart-card">
-                <div class="chart-title">ATS Seviye Dağılımı</div>
+                <div class="chart-title">ATS Severity Distribution</div>
                 <canvas id="chartSeverity" height="220"></canvas>
             </div>
             <div class="chart-card">
-                <div class="chart-title">En Çok Etkilenen Vendor'lar</div>
+                <div class="chart-title">Most Affected Vendors</div>
                 <canvas id="chartVendors" height="220"></canvas>
             </div>
         </div>
 
         <div class="section-header">
-            <div class="section-title">En Yüksek Tehdit Skoru — Top 10</div>
+            <div class="section-title">Highest Threat Score — Top 10</div>
         </div>
         <div class="cve-table-wrap">
             <table class="cve-table">
@@ -1000,10 +999,10 @@
                     <tr>
                         <th>ATS</th>
                         <th>CVE ID</th>
-                        <th>Açıklama</th>
+                        <th>Description</th>
                         <th>CVSS</th>
                         <th>EPSS</th>
-                        <th>Etiketler</th>
+                        <th>Tags</th>
                     </tr>
                 </thead>
                 <tbody id="dashboardTop10"></tbody>
@@ -1014,15 +1013,15 @@
     <!-- ══════ CVE Feed Page ══════ -->
     <div class="page" id="page-cve-feed">
         <div class="section-header">
-            <div class="section-title">CVE Tehdit Akışı</div>
+            <div class="section-title">CVE Threat Feed</div>
             <a class="export-btn" href="data/cve_feed.json" target="_blank">↓ JSON Export</a>
         </div>
 
         <div class="filter-bar">
-            <input type="text" class="search-input" id="cveSearch" placeholder="CVE ID, vendor, ürün veya anahtar kelime ara...">
-            <button class="filter-btn" data-filter="all">Tümü</button>
-            <button class="filter-btn" data-filter="CRITICAL">Kritik</button>
-            <button class="filter-btn" data-filter="HIGH">Yüksek</button>
+            <input type="text" class="search-input" id="cveSearch" placeholder="Search by CVE ID, vendor, product or keyword...">
+            <button class="filter-btn" data-filter="all">All</button>
+            <button class="filter-btn" data-filter="CRITICAL">Critical</button>
+            <button class="filter-btn" data-filter="HIGH">High</button>
             <button class="filter-btn" data-filter="kev">KEV</button>
             <button class="filter-btn" data-filter="poc">PoC</button>
             <button class="filter-btn" data-filter="nuclei">Nuclei</button>
@@ -1034,11 +1033,11 @@
                     <tr>
                         <th data-sort="ats_score">ATS ▾</th>
                         <th data-sort="cve_id">CVE ID</th>
-                        <th>Açıklama</th>
+                        <th>Description</th>
                         <th data-sort="cvss_score">CVSS</th>
                         <th data-sort="epss_score">EPSS</th>
-                        <th>Sosyal</th>
-                        <th>Etiketler</th>
+                        <th>Social</th>
+                        <th>Tags</th>
                         <th>MITRE</th>
                     </tr>
                 </thead>
@@ -1051,7 +1050,7 @@
     <!-- ══════ IP Blacklist Page ══════ -->
     <div class="page" id="page-ip-blacklist">
         <div class="section-header">
-            <div class="section-title">IP Kara Liste — Threat Intelligence</div>
+            <div class="section-title">IP Blacklist — Threat Intelligence</div>
             <div style="display:flex;gap:8px;">
                 <a class="export-btn" href="data/blacklist.txt" target="_blank">↓ TXT</a>
                 <a class="export-btn" href="data/ip_blacklist.json" target="_blank">↓ JSON</a>
@@ -1059,8 +1058,8 @@
         </div>
 
         <div class="filter-bar">
-            <input type="text" class="search-input" id="ipSearch" placeholder="IP adresi ara...">
-            <button class="filter-btn ip-filter" data-cat="all">Tümü</button>
+            <input type="text" class="search-input" id="ipSearch" placeholder="Search IP address...">
+            <button class="filter-btn ip-filter" data-cat="all">All</button>
             <button class="filter-btn ip-filter" data-cat="c2">C2</button>
             <button class="filter-btn ip-filter" data-cat="bruteforce">Brute Force</button>
             <button class="filter-btn ip-filter" data-cat="malicious">Malicious</button>
@@ -1071,10 +1070,10 @@
             <table class="ip-table">
                 <thead>
                     <tr>
-                        <th>IP Adresi</th>
-                        <th>Hit</th>
-                        <th>Kategoriler</th>
-                        <th>Kaynaklar</th>
+                        <th>IP Address</th>
+                        <th>Hits</th>
+                        <th>Categories</th>
+                        <th>Sources</th>
                     </tr>
                 </thead>
                 <tbody id="ipTableBody"></tbody>
@@ -1086,16 +1085,16 @@
     <!-- ══════ Analytics Page ══════ -->
     <div class="page" id="page-analytics">
         <div class="section-header">
-            <div class="section-title">Tehdit Analitiği</div>
+            <div class="section-title">Threat Analytics</div>
         </div>
 
         <div class="charts-grid">
             <div class="chart-card">
-                <div class="chart-title">En Yaygın CWE Tipleri</div>
+                <div class="chart-title">Top CWE Weakness Types</div>
                 <canvas id="chartCWE" height="280"></canvas>
             </div>
             <div class="chart-card">
-                <div class="chart-title">MITRE ATT&CK Taktikleri</div>
+                <div class="chart-title">MITRE ATT&CK Tactics</div>
                 <canvas id="chartMITRE" height="280"></canvas>
             </div>
         </div>
@@ -1106,28 +1105,28 @@
         <div class="about-content">
             <h2>ARGUN CTI — Cyber Threat Intelligence Platform</h2>
             <p>
-                ARGUN CTI, <a href="https://www.argunsec.com" target="_blank" style="color:var(--cyan)">ARGUN Security</a>
-                tarafından geliştirilen, açık kaynaklı bir siber tehdit istihbarat platformudur.
-                Birden fazla kaynaktan CVE verisi toplayarak, yapay zeka destekli
-                <strong>ARGUN Threat Score (ATS)</strong> ile önceliklendirme yapar.
+                ARGUN CTI is an open-source cyber threat intelligence platform developed by
+                <a href="https://www.argunsec.com" target="_blank" style="color:var(--cyan)">ARGUN Security</a>.
+                It aggregates CVE data from multiple sources and prioritizes threats using the
+                AI-powered <strong>ARGUN Threat Score (ATS)</strong> algorithm.
             </p>
             <p>
-                Platform, SOC analistlerinin ve CTI uzmanlarının günlük iş akışlarını desteklemek
-                için tasarlanmıştır. Tek bakışta hangi zafiyetin gerçek bir tehdit oluşturduğunu,
-                hangisinin aktif olarak sömürüldüğünü gösterir.
+                Designed to support the daily workflows of SOC analysts and CTI professionals,
+                the platform provides at-a-glance visibility into which vulnerabilities pose a
+                real threat and which are being actively exploited in the wild.
             </p>
 
-            <h2>ARGUN Threat Score (ATS) Nasıl Çalışır?</h2>
-            <p>ATS, beş farklı boyutu birleştiren 0-100 arası bir composite skordur:</p>
+            <h2>How ARGUN Threat Score (ATS) Works</h2>
+            <p>ATS is a composite score ranging from 0 to 100, combining five threat dimensions:</p>
             <ul class="source-list">
-                <li><strong>Teknik Ciddiyet (30 puan)</strong> — CVSS base score</li>
-                <li><strong>Exploit Olasılığı (25 puan)</strong> — EPSS score</li>
-                <li><strong>Silahlandırma (20 puan)</strong> — KEV, PoC, Nuclei template</li>
-                <li><strong>Sosyal Sinyal (15 puan)</strong> — Fediverse/topluluk aktivitesi</li>
-                <li><strong>Zaman Faktörü (10 puan)</strong> — Yayınlanma tarihi</li>
+                <li><strong>Technical Severity (30 pts)</strong> — CVSS base score</li>
+                <li><strong>Exploit Probability (25 pts)</strong> — EPSS score</li>
+                <li><strong>Weaponization (20 pts)</strong> — KEV status, PoC availability, Nuclei templates</li>
+                <li><strong>Social Signal (15 pts)</strong> — Fediverse / infosec community activity</li>
+                <li><strong>Recency Factor (10 pts)</strong> — Time since publication</li>
             </ul>
 
-            <h2>Veri Kaynakları</h2>
+            <h2>Data Sources</h2>
             <ul class="source-list">
                 <li>NVD — NIST National Vulnerability Database (API 2.0)</li>
                 <li>CISA KEV — Known Exploited Vulnerabilities Catalog</li>
@@ -1143,22 +1142,22 @@
                 <li>Binary Defense — Artillery threat feed</li>
             </ul>
 
-            <h2>API Kullanımı</h2>
-            <p>Tüm veriler JSON formatında açık API olarak sunulmaktadır:</p>
+            <h2>API Usage</h2>
+            <p>All data is available as open JSON endpoints:</p>
             <ul class="source-list">
-                <li><code>data/cve_feed.json</code> — CVE feed (ATS ile sıralı)</li>
-                <li><code>data/ip_blacklist.json</code> — IP kara liste (enriched)</li>
-                <li><code>data/stats.json</code> — Dashboard istatistikleri</li>
-                <li><code>data/blacklist.txt</code> — Firewall-ready IP listesi</li>
+                <li><code>data/cve_feed.json</code> — CVE feed (sorted by ATS)</li>
+                <li><code>data/ip_blacklist.json</code> — IP blacklist (enriched)</li>
+                <li><code>data/stats.json</code> — Dashboard statistics</li>
+                <li><code>data/blacklist.txt</code> — Firewall-ready IP blocklist</li>
             </ul>
 
-            <h2>İletişim</h2>
+            <h2>Contact</h2>
             <p>
                 <a href="https://www.argunsec.com" target="_blank" style="color:var(--cyan)">ARGUN Security</a> —
                 Clear Vision, Absolute Security
             </p>
             <p>
-                Geliştirici: <a href="https://www.linkedin.com/in/onuroktaycom/" target="_blank" style="color:var(--cyan)">Onur Oktay</a>
+                Developer: <a href="https://www.linkedin.com/in/onuroktaycom/" target="_blank" style="color:var(--cyan)">Onur Oktay</a>
             </p>
         </div>
     </div>
@@ -1234,7 +1233,7 @@ async function loadData() {
             const ts = cveResp.value.meta?.generated_at;
             if (ts) {
                 const d = new Date(ts);
-                document.getElementById('lastUpdate').textContent = d.toLocaleString('tr-TR');
+                document.getElementById('lastUpdate').textContent = d.toLocaleString('en-US');
             }
         }
 
@@ -1265,7 +1264,7 @@ function renderDemoData() {
     document.getElementById('dashboardTop10').innerHTML = `
         <tr><td colspan="6" class="empty-state">
             <div class="empty-state-icon">🔄</div>
-            <div>Pipeline henüz çalışmadı. GitHub Actions'ı tetikleyin veya <code>python main.py</code> çalıştırın.</div>
+            <div>Pipeline not yet executed. Trigger GitHub Actions or run <code>python main.py</code> locally.</div>
         </td></tr>
     `;
 }
@@ -1290,7 +1289,6 @@ function renderStats() {
         document.getElementById('statPoc').textContent = formatNum(s.poc_count);
         document.getElementById('statIps').textContent = formatNum(s.total_ips);
     } else {
-        // Calculate from raw data
         document.getElementById('statTotal').textContent = formatNum(state.cves.length);
         document.getElementById('statCritical').textContent = formatNum(state.cves.filter(c => c.ats_level === 'CRITICAL').length);
         document.getElementById('statHigh').textContent = formatNum(state.cves.filter(c => c.ats_level === 'HIGH').length);
@@ -1328,7 +1326,6 @@ function renderDashboardTop10() {
 
 // ─── Dashboard Charts ───
 function renderDashboardCharts() {
-    // Severity Distribution
     const sevDist = state.stats?.severity_distribution || {};
     const sevCtx = document.getElementById('chartSeverity')?.getContext('2d');
     if (sevCtx) {
@@ -1357,7 +1354,6 @@ function renderDashboardCharts() {
         });
     }
 
-    // Top Vendors
     const vendors = state.stats?.top_vendors || [];
     const vendorCtx = document.getElementById('chartVendors')?.getContext('2d');
     if (vendorCtx && vendors.length) {
@@ -1389,14 +1385,12 @@ function renderDashboardCharts() {
 function renderCVEFeed() {
     let filtered = [...state.cves];
 
-    // Filter
     if (state.cveFilter === 'kev') filtered = filtered.filter(c => c.in_kev);
     else if (state.cveFilter === 'poc') filtered = filtered.filter(c => c.has_poc);
     else if (state.cveFilter === 'nuclei') filtered = filtered.filter(c => c.nuclei_template);
     else if (state.cveFilter === 'CRITICAL') filtered = filtered.filter(c => c.ats_level === 'CRITICAL');
     else if (state.cveFilter === 'HIGH') filtered = filtered.filter(c => c.ats_level === 'HIGH');
 
-    // Search
     if (state.cveSearch) {
         const q = state.cveSearch.toLowerCase();
         filtered = filtered.filter(c =>
@@ -1406,14 +1400,12 @@ function renderCVEFeed() {
         );
     }
 
-    // Sort
     filtered.sort((a, b) => {
         const aVal = a[state.sortField] ?? 0;
         const bVal = b[state.sortField] ?? 0;
         return state.sortDir === 'desc' ? bVal - aVal : aVal - bVal;
     });
 
-    // Paginate
     const total = filtered.length;
     const totalPages = Math.ceil(total / ITEMS_PER_PAGE);
     state.cvePage = Math.min(state.cvePage, totalPages || 1);
@@ -1422,7 +1414,7 @@ function renderCVEFeed() {
 
     const tbody = document.getElementById('cveFeedBody');
     if (page.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="8" class="empty-state">Sonuç bulunamadı.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="8" class="empty-state">No results found.</td></tr>`;
     } else {
         tbody.innerHTML = page.map(cve => `
             <tr onclick="showCVEDetail('${cve.cve_id}')">
@@ -1448,7 +1440,6 @@ function renderCVEFeed() {
     });
 }
 
-// Filter buttons
 document.querySelectorAll('.filter-btn[data-filter]').forEach(btn => {
     btn.addEventListener('click', () => {
         document.querySelectorAll('.filter-btn[data-filter]').forEach(b => b.classList.remove('active'));
@@ -1459,14 +1450,12 @@ document.querySelectorAll('.filter-btn[data-filter]').forEach(btn => {
     });
 });
 
-// Search
 document.getElementById('cveSearch')?.addEventListener('input', (e) => {
     state.cveSearch = e.target.value;
     state.cvePage = 1;
     renderCVEFeed();
 });
 
-// Sort
 document.querySelectorAll('.cve-table th[data-sort]').forEach(th => {
     th.addEventListener('click', () => {
         const field = th.dataset.sort;
@@ -1501,7 +1490,7 @@ function renderIPBlacklist() {
 
     const tbody = document.getElementById('ipTableBody');
     if (page.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="4" class="empty-state">Sonuç bulunamadı.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="4" class="empty-state">No results found.</td></tr>`;
     } else {
         tbody.innerHTML = page.map(ip => `
             <tr>
@@ -1537,7 +1526,6 @@ document.getElementById('ipSearch')?.addEventListener('input', (e) => {
 
 // ─── Analytics ───
 function renderAnalytics() {
-    // CWE Chart
     const cwes = state.stats?.top_cwes || [];
     const cweCtx = document.getElementById('chartCWE')?.getContext('2d');
     if (cweCtx && cwes.length) {
@@ -1564,7 +1552,6 @@ function renderAnalytics() {
         });
     }
 
-    // MITRE Tactics
     const tactics = state.stats?.mitre_tactics || {};
     const mitreCtx = document.getElementById('chartMITRE')?.getContext('2d');
     if (mitreCtx && Object.keys(tactics).length) {
@@ -1609,7 +1596,7 @@ function showCVEDetail(cveId) {
             ${cve.has_poc ? '<span class="poc-tag">Public PoC</span>' : ''}
             ${cve.nuclei_template ? '<span class="nuclei-tag">Nuclei Template</span>' : ''}
         </div>
-        <div class="modal-desc">${escHtml(cve.description || 'Açıklama mevcut değil.')}</div>
+        <div class="modal-desc">${escHtml(cve.description || 'No description available.')}</div>
 
         <div class="modal-grid">
             <div class="modal-metric">
@@ -1621,8 +1608,8 @@ function showCVEDetail(cveId) {
                 <div class="modal-metric-value">${formatEPSS(cve.epss_score)}</div>
             </div>
             <div class="modal-metric">
-                <div class="modal-metric-label">Sosyal</div>
-                <div class="modal-metric-value" style="color:var(--cyan)">${cve.social_posts || 0} post</div>
+                <div class="modal-metric-label">Social Buzz</div>
+                <div class="modal-metric-value" style="color:var(--cyan)">${cve.social_posts || 0} posts</div>
             </div>
             <div class="modal-metric">
                 <div class="modal-metric-label">GitHub Repos</div>
@@ -1635,7 +1622,7 @@ function showCVEDetail(cveId) {
             <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;">
                 <div style="text-align:center;">
                     <div style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--red)">${bd.severity ?? '—'}</div>
-                    <div style="font-size:9px;color:var(--text-muted);text-transform:uppercase">Ciddiyet</div>
+                    <div style="font-size:9px;color:var(--text-muted);text-transform:uppercase">Severity</div>
                 </div>
                 <div style="text-align:center;">
                     <div style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--orange)">${bd.exploit_probability ?? '—'}</div>
@@ -1643,22 +1630,22 @@ function showCVEDetail(cveId) {
                 </div>
                 <div style="text-align:center;">
                     <div style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--yellow)">${bd.weaponization ?? '—'}</div>
-                    <div style="font-size:9px;color:var(--text-muted);text-transform:uppercase">Silah</div>
+                    <div style="font-size:9px;color:var(--text-muted);text-transform:uppercase">Weaponized</div>
                 </div>
                 <div style="text-align:center;">
                     <div style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--cyan)">${bd.social_signal ?? '—'}</div>
-                    <div style="font-size:9px;color:var(--text-muted);text-transform:uppercase">Sosyal</div>
+                    <div style="font-size:9px;color:var(--text-muted);text-transform:uppercase">Social</div>
                 </div>
                 <div style="text-align:center;">
                     <div style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--green)">${bd.time_factor ?? '—'}</div>
-                    <div style="font-size:9px;color:var(--text-muted);text-transform:uppercase">Zaman</div>
+                    <div style="font-size:9px;color:var(--text-muted);text-transform:uppercase">Recency</div>
                 </div>
             </div>
         </div>
 
         ${(cve.mitre_techniques || []).length > 0 ? `
         <div class="modal-section">
-            <div class="modal-section-title">MITRE ATT&CK Teknikleri</div>
+            <div class="modal-section-title">MITRE ATT&CK Techniques</div>
             <div style="display:flex;gap:6px;flex-wrap:wrap;">
                 ${cve.mitre_techniques.map(t => `<span class="mitre-tag" title="${t.tactic}">${t.id} — ${t.name}</span>`).join('')}
             </div>
@@ -1667,7 +1654,7 @@ function showCVEDetail(cveId) {
 
         ${(cve.affected_products || []).length > 0 ? `
         <div class="modal-section">
-            <div class="modal-section-title">Etkilenen Ürünler</div>
+            <div class="modal-section-title">Affected Products</div>
             <div style="display:flex;gap:6px;flex-wrap:wrap;">
                 ${cve.affected_products.slice(0,10).map(p => `<span class="category-tag">${p.vendor}/${p.product}</span>`).join('')}
             </div>
@@ -1676,7 +1663,7 @@ function showCVEDetail(cveId) {
 
         ${(cve.cwes || []).length > 0 ? `
         <div class="modal-section">
-            <div class="modal-section-title">CWE</div>
+            <div class="modal-section-title">CWE Weaknesses</div>
             <div style="display:flex;gap:6px;flex-wrap:wrap;">
                 ${cve.cwes.map(c => `<span class="badge badge-info">${c}</span>`).join('')}
             </div>
@@ -1685,13 +1672,13 @@ function showCVEDetail(cveId) {
 
         ${(cve.references || []).length > 0 ? `
         <div class="modal-section modal-refs">
-            <div class="modal-section-title">Referanslar</div>
+            <div class="modal-section-title">References</div>
             ${cve.references.slice(0,8).map(r => `<a href="${escHtml(r.url)}" target="_blank" rel="noopener">${escHtml(r.url)}</a>`).join('')}
         </div>
         ` : ''}
 
         <div style="margin-top:20px;text-align:center;">
-            <a href="https://nvd.nist.gov/vuln/detail/${cve.cve_id}" target="_blank" class="export-btn">NVD'de Görüntüle →</a>
+            <a href="https://nvd.nist.gov/vuln/detail/${cve.cve_id}" target="_blank" class="export-btn">View on NVD →</a>
         </div>
     `;
 
@@ -1720,7 +1707,7 @@ function renderPagination(containerId, currentPage, totalPages, onPageChange) {
         return;
     }
 
-    let html = `<button class="page-btn" ${currentPage <= 1 ? 'disabled' : ''} onclick="return false;">← Önceki</button>`;
+    let html = `<button class="page-btn" ${currentPage <= 1 ? 'disabled' : ''} onclick="return false;">← Prev</button>`;
 
     const range = getPageRange(currentPage, totalPages);
     for (const p of range) {
@@ -1731,17 +1718,16 @@ function renderPagination(containerId, currentPage, totalPages, onPageChange) {
         }
     }
 
-    html += `<button class="page-btn" ${currentPage >= totalPages ? 'disabled' : ''}>Sonraki →</button>`;
+    html += `<button class="page-btn" ${currentPage >= totalPages ? 'disabled' : ''}>Next →</button>`;
     html += `<span class="page-info">${currentPage}/${totalPages}</span>`;
 
     container.innerHTML = html;
 
-    // Event delegation
     container.querySelectorAll('.page-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             const text = btn.textContent.trim();
-            if (text === '← Önceki' && currentPage > 1) onPageChange(currentPage - 1);
-            else if (text === 'Sonraki →' && currentPage < totalPages) onPageChange(currentPage + 1);
+            if (text === '← Prev' && currentPage > 1) onPageChange(currentPage - 1);
+            else if (text === 'Next →' && currentPage < totalPages) onPageChange(currentPage + 1);
             else {
                 const num = parseInt(text);
                 if (!isNaN(num)) onPageChange(num);
@@ -1765,7 +1751,7 @@ function getPageRange(current, total) {
 
 // ─── Helpers ───
 function formatNum(n) {
-    return (n || 0).toLocaleString('tr-TR');
+    return (n || 0).toLocaleString('en-US');
 }
 
 function formatEPSS(val) {
