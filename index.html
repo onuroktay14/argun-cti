@@ -1,0 +1,1802 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ARGUN CTI — Cyber Threat Intelligence Platform</title>
+    <meta name="description" content="AI-powered Cyber Threat Intelligence Platform by ARGUN Security. CVE tracking, IP blacklist, MITRE ATT&CK mapping, and real-time threat scoring.">
+    <meta name="author" content="ARGUN Security — www.argunsec.com">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛡️</text></svg>">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+    <style>
+        :root {
+            --bg-primary: #0a0e17;
+            --bg-secondary: #111827;
+            --bg-card: #1a1f2e;
+            --bg-card-hover: #1f2639;
+            --bg-input: #0d1117;
+            --border: #2a3042;
+            --border-accent: #374151;
+            --text-primary: #e2e8f0;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --cyan: #00e5ff;
+            --cyan-dim: rgba(0,229,255,0.15);
+            --cyan-glow: rgba(0,229,255,0.3);
+            --red: #ff1744;
+            --red-dim: rgba(255,23,68,0.15);
+            --orange: #ff9100;
+            --orange-dim: rgba(255,145,0,0.15);
+            --yellow: #ffd600;
+            --yellow-dim: rgba(255,214,0,0.12);
+            --blue: #448aff;
+            --blue-dim: rgba(68,138,255,0.15);
+            --green: #00e676;
+            --green-dim: rgba(0,230,118,0.12);
+            --purple: #b388ff;
+            --radius: 8px;
+            --radius-lg: 12px;
+            --mono: 'JetBrains Mono', monospace;
+            --sans: 'Space Grotesk', sans-serif;
+            --transition: 0.2s ease;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: var(--sans);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        /* ─── Animated Background ─── */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background:
+                radial-gradient(ellipse at 20% 20%, rgba(0,229,255,0.03) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 80%, rgba(255,23,68,0.02) 0%, transparent 60%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* ─── Scanline Effect ─── */
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 2px,
+                rgba(0,229,255,0.008) 2px,
+                rgba(0,229,255,0.008) 4px
+            );
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        /* ─── Header ─── */
+        .header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(10,14,23,0.92);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            padding: 0 24px;
+        }
+
+        .header-inner {
+            max-width: 1440px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 64px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, var(--cyan), #0091ea);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--bg-primary);
+            font-family: var(--mono);
+            letter-spacing: -1px;
+            box-shadow: 0 0 20px rgba(0,229,255,0.25);
+        }
+
+        .logo-text {
+            font-family: var(--mono);
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: 1px;
+        }
+
+        .logo-text span {
+            color: var(--cyan);
+        }
+
+        .logo-badge {
+            font-size: 10px;
+            font-family: var(--mono);
+            background: var(--cyan-dim);
+            color: var(--cyan);
+            padding: 2px 8px;
+            border-radius: 4px;
+            border: 1px solid rgba(0,229,255,0.2);
+        }
+
+        /* ─── Navigation ─── */
+        .nav {
+            display: flex;
+            gap: 4px;
+        }
+
+        .nav-btn {
+            font-family: var(--sans);
+            font-size: 13px;
+            font-weight: 500;
+            padding: 8px 16px;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            cursor: pointer;
+            border-radius: var(--radius);
+            transition: var(--transition);
+            white-space: nowrap;
+        }
+
+        .nav-btn:hover {
+            background: var(--bg-card);
+            color: var(--text-primary);
+        }
+
+        .nav-btn.active {
+            background: var(--cyan-dim);
+            color: var(--cyan);
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .update-badge {
+            font-family: var(--mono);
+            font-size: 11px;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .update-badge .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--green);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        /* ─── Main Content ─── */
+        .main {
+            max-width: 1440px;
+            margin: 0 auto;
+            padding: 24px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .page { display: none; }
+        .page.active { display: block; }
+
+        /* ─── Stats Cards ─── */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+        }
+
+        .stat-card.critical::before { background: var(--red); }
+        .stat-card.high::before { background: var(--orange); }
+        .stat-card.kev::before { background: var(--yellow); }
+        .stat-card.poc::before { background: var(--purple); }
+        .stat-card.ips::before { background: var(--cyan); }
+        .stat-card.total::before { background: var(--blue); }
+
+        .stat-card:hover {
+            border-color: var(--border-accent);
+            transform: translateY(-1px);
+        }
+
+        .stat-label {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-family: var(--mono);
+            font-size: 32px;
+            font-weight: 700;
+            line-height: 1;
+        }
+
+        .stat-card.critical .stat-value { color: var(--red); }
+        .stat-card.high .stat-value { color: var(--orange); }
+        .stat-card.kev .stat-value { color: var(--yellow); }
+        .stat-card.poc .stat-value { color: var(--purple); }
+        .stat-card.ips .stat-value { color: var(--cyan); }
+        .stat-card.total .stat-value { color: var(--blue); }
+
+        /* ─── Section Headers ─── */
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .section-title {
+            font-family: var(--mono);
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--text-secondary);
+        }
+
+        .section-title::before {
+            content: '//';
+            color: var(--cyan);
+            margin-right: 8px;
+        }
+
+        /* ─── Filter Bar ─── */
+        .filter-bar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .search-input {
+            flex: 1;
+            min-width: 250px;
+            padding: 10px 16px;
+            font-family: var(--mono);
+            font-size: 13px;
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            color: var(--text-primary);
+            transition: var(--transition);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--cyan);
+            box-shadow: 0 0 0 3px rgba(0,229,255,0.1);
+        }
+
+        .search-input::placeholder { color: var(--text-muted); }
+
+        .filter-btn {
+            font-family: var(--mono);
+            font-size: 11px;
+            font-weight: 600;
+            padding: 10px 14px;
+            border: 1px solid var(--border);
+            background: var(--bg-card);
+            color: var(--text-secondary);
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: var(--transition);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .filter-btn:hover, .filter-btn.active {
+            border-color: var(--cyan);
+            color: var(--cyan);
+            background: var(--cyan-dim);
+        }
+
+        .export-btn {
+            font-family: var(--mono);
+            font-size: 11px;
+            font-weight: 600;
+            padding: 10px 16px;
+            border: 1px solid var(--cyan);
+            background: var(--cyan-dim);
+            color: var(--cyan);
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: var(--transition);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .export-btn:hover {
+            background: rgba(0,229,255,0.25);
+        }
+
+        /* ─── CVE Table ─── */
+        .cve-table-wrap {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+        }
+
+        .cve-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .cve-table thead {
+            background: rgba(0,0,0,0.3);
+        }
+
+        .cve-table th {
+            font-family: var(--mono);
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+            cursor: pointer;
+            user-select: none;
+            white-space: nowrap;
+        }
+
+        .cve-table th:hover { color: var(--cyan); }
+
+        .cve-table tbody tr {
+            border-bottom: 1px solid rgba(42,48,66,0.5);
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .cve-table tbody tr:hover {
+            background: rgba(0,229,255,0.03);
+        }
+
+        .cve-table td {
+            padding: 14px 16px;
+            font-size: 13px;
+            vertical-align: middle;
+        }
+
+        .cve-id-cell {
+            font-family: var(--mono);
+            font-weight: 600;
+            color: var(--cyan);
+            font-size: 12px;
+        }
+
+        .cve-desc {
+            color: var(--text-secondary);
+            font-size: 12px;
+            max-width: 350px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        /* ─── Badges ─── */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-family: var(--mono);
+            font-size: 11px;
+            font-weight: 600;
+            padding: 3px 8px;
+            border-radius: 4px;
+            white-space: nowrap;
+        }
+
+        .badge-critical { background: var(--red-dim); color: var(--red); border: 1px solid rgba(255,23,68,0.3); }
+        .badge-high { background: var(--orange-dim); color: var(--orange); border: 1px solid rgba(255,145,0,0.3); }
+        .badge-medium { background: var(--yellow-dim); color: var(--yellow); border: 1px solid rgba(255,214,0,0.2); }
+        .badge-low { background: var(--blue-dim); color: var(--blue); border: 1px solid rgba(68,138,255,0.3); }
+        .badge-info { background: rgba(100,116,139,0.15); color: var(--text-muted); border: 1px solid rgba(100,116,139,0.2); }
+
+        .ats-badge {
+            font-family: var(--mono);
+            font-size: 13px;
+            font-weight: 700;
+            min-width: 42px;
+            text-align: center;
+            padding: 4px 8px;
+            border-radius: 6px;
+        }
+
+        .ats-critical { background: var(--red-dim); color: var(--red); border: 1px solid rgba(255,23,68,0.4); }
+        .ats-high { background: var(--orange-dim); color: var(--orange); border: 1px solid rgba(255,145,0,0.4); }
+        .ats-medium { background: var(--yellow-dim); color: var(--yellow); border: 1px solid rgba(255,214,0,0.3); }
+        .ats-low { background: var(--blue-dim); color: var(--blue); border: 1px solid rgba(68,138,255,0.3); }
+        .ats-info { background: rgba(100,116,139,0.15); color: var(--text-muted); border: 1px solid rgba(100,116,139,0.2); }
+
+        .kev-tag {
+            font-family: var(--mono);
+            font-size: 9px;
+            font-weight: 700;
+            background: rgba(255,23,68,0.2);
+            color: var(--red);
+            padding: 2px 6px;
+            border-radius: 3px;
+            letter-spacing: 0.5px;
+        }
+
+        .poc-tag {
+            font-family: var(--mono);
+            font-size: 9px;
+            font-weight: 700;
+            background: rgba(179,136,255,0.2);
+            color: var(--purple);
+            padding: 2px 6px;
+            border-radius: 3px;
+            letter-spacing: 0.5px;
+        }
+
+        .nuclei-tag {
+            font-family: var(--mono);
+            font-size: 9px;
+            font-weight: 700;
+            background: rgba(0,230,118,0.15);
+            color: var(--green);
+            padding: 2px 6px;
+            border-radius: 3px;
+            letter-spacing: 0.5px;
+        }
+
+        .mitre-tag {
+            font-family: var(--mono);
+            font-size: 10px;
+            background: rgba(68,138,255,0.12);
+            color: var(--blue);
+            padding: 2px 6px;
+            border-radius: 3px;
+            margin: 1px 2px;
+            display: inline-block;
+        }
+
+        .score-cell {
+            font-family: var(--mono);
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .social-cell {
+            font-family: var(--mono);
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        .tags-cell {
+            display: flex;
+            gap: 4px;
+            flex-wrap: wrap;
+        }
+
+        /* ─── IP Blacklist Table ─── */
+        .ip-table-wrap {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+        }
+
+        .ip-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .ip-table thead { background: rgba(0,0,0,0.3); }
+
+        .ip-table th {
+            font-family: var(--mono);
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+            cursor: pointer;
+        }
+
+        .ip-table th:hover { color: var(--cyan); }
+
+        .ip-table tbody tr {
+            border-bottom: 1px solid rgba(42,48,66,0.5);
+            transition: var(--transition);
+        }
+
+        .ip-table tbody tr:hover { background: rgba(0,229,255,0.03); }
+
+        .ip-table td {
+            padding: 10px 16px;
+            font-size: 13px;
+            font-family: var(--mono);
+        }
+
+        .ip-addr { color: var(--red); font-weight: 600; font-size: 12px; }
+
+        .hit-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 28px;
+            height: 22px;
+            font-family: var(--mono);
+            font-size: 11px;
+            font-weight: 700;
+            border-radius: 4px;
+        }
+
+        .hit-high { background: var(--red-dim); color: var(--red); }
+        .hit-medium { background: var(--orange-dim); color: var(--orange); }
+        .hit-low { background: var(--yellow-dim); color: var(--yellow); }
+
+        .category-tag {
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 3px;
+            background: var(--cyan-dim);
+            color: var(--cyan);
+            margin: 1px 2px;
+            display: inline-block;
+        }
+
+        /* ─── Charts Section ─── */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .chart-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+        }
+
+        .chart-title {
+            font-family: var(--mono);
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            margin-bottom: 16px;
+        }
+
+        /* ─── CVE Detail Modal ─── */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(8px);
+            z-index: 200;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 60px 24px;
+            overflow-y: auto;
+        }
+
+        .modal-overlay.active { display: flex; }
+
+        .modal {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            max-width: 800px;
+            width: 100%;
+            padding: 32px;
+            position: relative;
+            animation: modalIn 0.2s ease;
+        }
+
+        @keyframes modalIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            width: 32px;
+            height: 32px;
+            border: 1px solid var(--border);
+            background: var(--bg-card);
+            color: var(--text-secondary);
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            transition: var(--transition);
+        }
+
+        .modal-close:hover { border-color: var(--red); color: var(--red); }
+
+        .modal-cve-id {
+            font-family: var(--mono);
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--cyan);
+            margin-bottom: 8px;
+        }
+
+        .modal-desc {
+            color: var(--text-secondary);
+            font-size: 14px;
+            line-height: 1.7;
+            margin-bottom: 20px;
+        }
+
+        .modal-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .modal-metric {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 14px;
+        }
+
+        .modal-metric-label {
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+        }
+
+        .modal-metric-value {
+            font-family: var(--mono);
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .modal-section {
+            margin-top: 20px;
+        }
+
+        .modal-section-title {
+            font-family: var(--mono);
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            margin-bottom: 10px;
+            padding-bottom: 6px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .modal-refs a {
+            display: block;
+            color: var(--cyan);
+            font-family: var(--mono);
+            font-size: 12px;
+            padding: 4px 0;
+            text-decoration: none;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .modal-refs a:hover { text-decoration: underline; }
+
+        /* ─── About Page ─── */
+        .about-content {
+            max-width: 800px;
+        }
+
+        .about-content h2 {
+            font-family: var(--mono);
+            font-size: 20px;
+            color: var(--cyan);
+            margin: 32px 0 12px 0;
+        }
+
+        .about-content p {
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+            line-height: 1.8;
+        }
+
+        .about-content code {
+            font-family: var(--mono);
+            font-size: 12px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            padding: 2px 6px;
+            border-radius: 3px;
+            color: var(--cyan);
+        }
+
+        .source-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .source-list li {
+            font-family: var(--mono);
+            font-size: 13px;
+            color: var(--text-secondary);
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .source-list li::before {
+            content: '▸';
+            color: var(--cyan);
+        }
+
+        /* ─── Pagination ─── */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            margin-top: 20px;
+            padding: 16px 0;
+        }
+
+        .page-btn {
+            font-family: var(--mono);
+            font-size: 12px;
+            padding: 8px 14px;
+            border: 1px solid var(--border);
+            background: var(--bg-card);
+            color: var(--text-secondary);
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .page-btn:hover { border-color: var(--cyan); color: var(--cyan); }
+        .page-btn.active { background: var(--cyan-dim); color: var(--cyan); border-color: var(--cyan); }
+        .page-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+        .page-info {
+            font-family: var(--mono);
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        /* ─── Loading ─── */
+        .loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 80px 0;
+            color: var(--text-muted);
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--border);
+            border-top-color: var(--cyan);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-bottom: 16px;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* ─── Footer ─── */
+        .footer {
+            text-align: center;
+            padding: 32px 24px;
+            border-top: 1px solid var(--border);
+            margin-top: 48px;
+        }
+
+        .footer-text {
+            font-family: var(--mono);
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .footer-text a {
+            color: var(--cyan);
+            text-decoration: none;
+        }
+
+        .footer-text a:hover { text-decoration: underline; }
+
+        /* ─── Responsive ─── */
+        @media (max-width: 768px) {
+            .nav { display: none; }
+            .header-inner { height: 56px; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .charts-grid { grid-template-columns: 1fr; }
+            .filter-bar { flex-direction: column; }
+            .search-input { min-width: 100%; }
+            .cve-table { font-size: 12px; }
+            .cve-desc { display: none; }
+            .main { padding: 16px; }
+            .modal { padding: 20px; margin: 20px; }
+        }
+
+        /* ─── Empty State ─── */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-muted);
+        }
+
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+    </style>
+</head>
+<body>
+
+<!-- ─── Header ─── -->
+<header class="header">
+    <div class="header-inner">
+        <a href="#" class="logo" onclick="navigate('dashboard')">
+            <div class="logo-icon">A</div>
+            <div>
+                <div class="logo-text">ARGUN <span>CTI</span></div>
+            </div>
+            <div class="logo-badge">v2.0</div>
+        </a>
+
+        <nav class="nav">
+            <button class="nav-btn active" data-page="dashboard">Dashboard</button>
+            <button class="nav-btn" data-page="cve-feed">CVE Feed</button>
+            <button class="nav-btn" data-page="ip-blacklist">IP Blacklist</button>
+            <button class="nav-btn" data-page="analytics">Analytics</button>
+            <button class="nav-btn" data-page="about">Hakkında</button>
+        </nav>
+
+        <div class="header-right">
+            <div class="update-badge">
+                <div class="dot"></div>
+                <span id="lastUpdate">Yükleniyor...</span>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- ─── Main ─── -->
+<main class="main">
+
+    <!-- ══════ Dashboard Page ══════ -->
+    <div class="page active" id="page-dashboard">
+        <div class="stats-grid">
+            <div class="stat-card total">
+                <div class="stat-label">Toplam CVE</div>
+                <div class="stat-value" id="statTotal">—</div>
+            </div>
+            <div class="stat-card critical">
+                <div class="stat-label">Kritik (ATS 80+)</div>
+                <div class="stat-value" id="statCritical">—</div>
+            </div>
+            <div class="stat-card high">
+                <div class="stat-label">Yüksek (ATS 60+)</div>
+                <div class="stat-value" id="statHigh">—</div>
+            </div>
+            <div class="stat-card kev">
+                <div class="stat-label">CISA KEV</div>
+                <div class="stat-value" id="statKev">—</div>
+            </div>
+            <div class="stat-card poc">
+                <div class="stat-label">Aktif Exploit/PoC</div>
+                <div class="stat-value" id="statPoc">—</div>
+            </div>
+            <div class="stat-card ips">
+                <div class="stat-label">Kötücül IP</div>
+                <div class="stat-value" id="statIps">—</div>
+            </div>
+        </div>
+
+        <div class="charts-grid">
+            <div class="chart-card">
+                <div class="chart-title">ATS Seviye Dağılımı</div>
+                <canvas id="chartSeverity" height="220"></canvas>
+            </div>
+            <div class="chart-card">
+                <div class="chart-title">En Çok Etkilenen Vendor'lar</div>
+                <canvas id="chartVendors" height="220"></canvas>
+            </div>
+        </div>
+
+        <div class="section-header">
+            <div class="section-title">En Yüksek Tehdit Skoru — Top 10</div>
+        </div>
+        <div class="cve-table-wrap">
+            <table class="cve-table">
+                <thead>
+                    <tr>
+                        <th>ATS</th>
+                        <th>CVE ID</th>
+                        <th>Açıklama</th>
+                        <th>CVSS</th>
+                        <th>EPSS</th>
+                        <th>Etiketler</th>
+                    </tr>
+                </thead>
+                <tbody id="dashboardTop10"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ══════ CVE Feed Page ══════ -->
+    <div class="page" id="page-cve-feed">
+        <div class="section-header">
+            <div class="section-title">CVE Tehdit Akışı</div>
+            <a class="export-btn" href="data/cve_feed.json" target="_blank">↓ JSON Export</a>
+        </div>
+
+        <div class="filter-bar">
+            <input type="text" class="search-input" id="cveSearch" placeholder="CVE ID, vendor, ürün veya anahtar kelime ara...">
+            <button class="filter-btn" data-filter="all">Tümü</button>
+            <button class="filter-btn" data-filter="CRITICAL">Kritik</button>
+            <button class="filter-btn" data-filter="HIGH">Yüksek</button>
+            <button class="filter-btn" data-filter="kev">KEV</button>
+            <button class="filter-btn" data-filter="poc">PoC</button>
+            <button class="filter-btn" data-filter="nuclei">Nuclei</button>
+        </div>
+
+        <div class="cve-table-wrap">
+            <table class="cve-table">
+                <thead>
+                    <tr>
+                        <th data-sort="ats_score">ATS ▾</th>
+                        <th data-sort="cve_id">CVE ID</th>
+                        <th>Açıklama</th>
+                        <th data-sort="cvss_score">CVSS</th>
+                        <th data-sort="epss_score">EPSS</th>
+                        <th>Sosyal</th>
+                        <th>Etiketler</th>
+                        <th>MITRE</th>
+                    </tr>
+                </thead>
+                <tbody id="cveFeedBody"></tbody>
+            </table>
+        </div>
+        <div class="pagination" id="cvePagination"></div>
+    </div>
+
+    <!-- ══════ IP Blacklist Page ══════ -->
+    <div class="page" id="page-ip-blacklist">
+        <div class="section-header">
+            <div class="section-title">IP Kara Liste — Threat Intelligence</div>
+            <div style="display:flex;gap:8px;">
+                <a class="export-btn" href="data/blacklist.txt" target="_blank">↓ TXT</a>
+                <a class="export-btn" href="data/ip_blacklist.json" target="_blank">↓ JSON</a>
+            </div>
+        </div>
+
+        <div class="filter-bar">
+            <input type="text" class="search-input" id="ipSearch" placeholder="IP adresi ara...">
+            <button class="filter-btn ip-filter" data-cat="all">Tümü</button>
+            <button class="filter-btn ip-filter" data-cat="c2">C2</button>
+            <button class="filter-btn ip-filter" data-cat="bruteforce">Brute Force</button>
+            <button class="filter-btn ip-filter" data-cat="malicious">Malicious</button>
+            <button class="filter-btn ip-filter" data-cat="malware_distribution">Malware</button>
+        </div>
+
+        <div class="ip-table-wrap">
+            <table class="ip-table">
+                <thead>
+                    <tr>
+                        <th>IP Adresi</th>
+                        <th>Hit</th>
+                        <th>Kategoriler</th>
+                        <th>Kaynaklar</th>
+                    </tr>
+                </thead>
+                <tbody id="ipTableBody"></tbody>
+            </table>
+        </div>
+        <div class="pagination" id="ipPagination"></div>
+    </div>
+
+    <!-- ══════ Analytics Page ══════ -->
+    <div class="page" id="page-analytics">
+        <div class="section-header">
+            <div class="section-title">Tehdit Analitiği</div>
+        </div>
+
+        <div class="charts-grid">
+            <div class="chart-card">
+                <div class="chart-title">En Yaygın CWE Tipleri</div>
+                <canvas id="chartCWE" height="280"></canvas>
+            </div>
+            <div class="chart-card">
+                <div class="chart-title">MITRE ATT&CK Taktikleri</div>
+                <canvas id="chartMITRE" height="280"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══════ About Page ══════ -->
+    <div class="page" id="page-about">
+        <div class="about-content">
+            <h2>ARGUN CTI — Cyber Threat Intelligence Platform</h2>
+            <p>
+                ARGUN CTI, <a href="https://www.argunsec.com" target="_blank" style="color:var(--cyan)">ARGUN Security</a>
+                tarafından geliştirilen, açık kaynaklı bir siber tehdit istihbarat platformudur.
+                Birden fazla kaynaktan CVE verisi toplayarak, yapay zeka destekli
+                <strong>ARGUN Threat Score (ATS)</strong> ile önceliklendirme yapar.
+            </p>
+            <p>
+                Platform, SOC analistlerinin ve CTI uzmanlarının günlük iş akışlarını desteklemek
+                için tasarlanmıştır. Tek bakışta hangi zafiyetin gerçek bir tehdit oluşturduğunu,
+                hangisinin aktif olarak sömürüldüğünü gösterir.
+            </p>
+
+            <h2>ARGUN Threat Score (ATS) Nasıl Çalışır?</h2>
+            <p>ATS, beş farklı boyutu birleştiren 0-100 arası bir composite skordur:</p>
+            <ul class="source-list">
+                <li><strong>Teknik Ciddiyet (30 puan)</strong> — CVSS base score</li>
+                <li><strong>Exploit Olasılığı (25 puan)</strong> — EPSS score</li>
+                <li><strong>Silahlandırma (20 puan)</strong> — KEV, PoC, Nuclei template</li>
+                <li><strong>Sosyal Sinyal (15 puan)</strong> — Fediverse/topluluk aktivitesi</li>
+                <li><strong>Zaman Faktörü (10 puan)</strong> — Yayınlanma tarihi</li>
+            </ul>
+
+            <h2>Veri Kaynakları</h2>
+            <ul class="source-list">
+                <li>NVD — NIST National Vulnerability Database (API 2.0)</li>
+                <li>CISA KEV — Known Exploited Vulnerabilities Catalog</li>
+                <li>FIRST EPSS — Exploit Prediction Scoring System</li>
+                <li>FediSecFeeds — Fediverse CVE social intelligence</li>
+                <li>GitHub — PoC repository detection</li>
+                <li>Nuclei Templates — Automated exploit detection</li>
+                <li>stamparm/ipsum — 30+ IP blacklist aggregation</li>
+                <li>abuse.ch — Feodo Tracker, SSL Blacklist, URLhaus</li>
+                <li>Blocklist.de — Brute force IP database</li>
+                <li>Emerging Threats — Proofpoint threat IPs</li>
+                <li>CINS Army — Sentinel-based threat intelligence</li>
+                <li>Binary Defense — Artillery threat feed</li>
+            </ul>
+
+            <h2>API Kullanımı</h2>
+            <p>Tüm veriler JSON formatında açık API olarak sunulmaktadır:</p>
+            <ul class="source-list">
+                <li><code>data/cve_feed.json</code> — CVE feed (ATS ile sıralı)</li>
+                <li><code>data/ip_blacklist.json</code> — IP kara liste (enriched)</li>
+                <li><code>data/stats.json</code> — Dashboard istatistikleri</li>
+                <li><code>data/blacklist.txt</code> — Firewall-ready IP listesi</li>
+            </ul>
+
+            <h2>İletişim</h2>
+            <p>
+                <a href="https://www.argunsec.com" target="_blank" style="color:var(--cyan)">ARGUN Security</a> —
+                Clear Vision, Absolute Security
+            </p>
+            <p>
+                Geliştirici: <a href="https://www.linkedin.com/in/onuroktaycom/" target="_blank" style="color:var(--cyan)">Onur Oktay</a>
+            </p>
+        </div>
+    </div>
+
+</main>
+
+<!-- ─── CVE Detail Modal ─── -->
+<div class="modal-overlay" id="cveModal">
+    <div class="modal">
+        <button class="modal-close" onclick="closeModal()">&times;</button>
+        <div id="modalContent"></div>
+    </div>
+</div>
+
+<!-- ─── Footer ─── -->
+<footer class="footer">
+    <div class="footer-text">
+        <a href="https://www.argunsec.com" target="_blank">ARGUN Security</a> — Clear Vision, Absolute Security
+        &nbsp;|&nbsp; ARGUN CTI v2.0
+        &nbsp;|&nbsp; <a href="https://github.com/onuroktay14/argun-cti" target="_blank">GitHub</a>
+    </div>
+</footer>
+
+<script>
+// ═══════════════════════════════════════════════════
+// ARGUN CTI v2 — Frontend Application
+// ═══════════════════════════════════════════════════
+
+const DATA_BASE = 'data/';
+const ITEMS_PER_PAGE = 30;
+
+let state = {
+    cves: [],
+    ips: [],
+    stats: null,
+    currentPage: 'dashboard',
+    cveFilter: 'all',
+    cveSearch: '',
+    cvePage: 1,
+    ipFilter: 'all',
+    ipSearch: '',
+    ipPage: 1,
+    sortField: 'ats_score',
+    sortDir: 'desc',
+};
+
+// ─── Navigation ───
+document.querySelectorAll('.nav-btn').forEach(btn => {
+    btn.addEventListener('click', () => navigate(btn.dataset.page));
+});
+
+function navigate(page) {
+    state.currentPage = page;
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById(`page-${page}`).classList.add('active');
+    document.querySelector(`.nav-btn[data-page="${page}"]`)?.classList.add('active');
+
+    if (page === 'analytics') renderAnalytics();
+}
+
+// ─── Data Loading ───
+async function loadData() {
+    try {
+        const [cveResp, ipResp, statsResp] = await Promise.allSettled([
+            fetch(`${DATA_BASE}cve_feed.json`).then(r => r.json()),
+            fetch(`${DATA_BASE}ip_blacklist.json`).then(r => r.json()),
+            fetch(`${DATA_BASE}stats.json`).then(r => r.json()),
+        ]);
+
+        if (cveResp.status === 'fulfilled') {
+            state.cves = cveResp.value.cves || [];
+            const ts = cveResp.value.meta?.generated_at;
+            if (ts) {
+                const d = new Date(ts);
+                document.getElementById('lastUpdate').textContent = d.toLocaleString('tr-TR');
+            }
+        }
+
+        if (ipResp.status === 'fulfilled') {
+            state.ips = ipResp.value.blacklist || [];
+        }
+
+        if (statsResp.status === 'fulfilled') {
+            state.stats = statsResp.value;
+        }
+
+        renderAll();
+
+    } catch (err) {
+        console.error('Data load error:', err);
+        renderDemoData();
+    }
+}
+
+// ─── Demo Data (when no pipeline data exists yet) ───
+function renderDemoData() {
+    document.getElementById('statTotal').textContent = '—';
+    document.getElementById('statCritical').textContent = '—';
+    document.getElementById('statHigh').textContent = '—';
+    document.getElementById('statKev').textContent = '—';
+    document.getElementById('statPoc').textContent = '—';
+    document.getElementById('statIps').textContent = '—';
+    document.getElementById('dashboardTop10').innerHTML = `
+        <tr><td colspan="6" class="empty-state">
+            <div class="empty-state-icon">🔄</div>
+            <div>Pipeline henüz çalışmadı. GitHub Actions'ı tetikleyin veya <code>python main.py</code> çalıştırın.</div>
+        </td></tr>
+    `;
+}
+
+// ─── Render All ───
+function renderAll() {
+    renderStats();
+    renderDashboardTop10();
+    renderCVEFeed();
+    renderIPBlacklist();
+    renderDashboardCharts();
+}
+
+// ─── Stats ───
+function renderStats() {
+    if (state.stats?.summary) {
+        const s = state.stats.summary;
+        document.getElementById('statTotal').textContent = formatNum(s.total_cves);
+        document.getElementById('statCritical').textContent = formatNum(s.critical_count);
+        document.getElementById('statHigh').textContent = formatNum(s.high_count);
+        document.getElementById('statKev').textContent = formatNum(s.kev_count);
+        document.getElementById('statPoc').textContent = formatNum(s.poc_count);
+        document.getElementById('statIps').textContent = formatNum(s.total_ips);
+    } else {
+        // Calculate from raw data
+        document.getElementById('statTotal').textContent = formatNum(state.cves.length);
+        document.getElementById('statCritical').textContent = formatNum(state.cves.filter(c => c.ats_level === 'CRITICAL').length);
+        document.getElementById('statHigh').textContent = formatNum(state.cves.filter(c => c.ats_level === 'HIGH').length);
+        document.getElementById('statKev').textContent = formatNum(state.cves.filter(c => c.in_kev).length);
+        document.getElementById('statPoc').textContent = formatNum(state.cves.filter(c => c.has_poc || c.nuclei_template).length);
+        document.getElementById('statIps').textContent = formatNum(state.ips.length);
+    }
+}
+
+// ─── Dashboard Top 10 ───
+function renderDashboardTop10() {
+    const top10 = state.cves.slice(0, 10);
+    const tbody = document.getElementById('dashboardTop10');
+
+    if (top10.length === 0) {
+        renderDemoData();
+        return;
+    }
+
+    tbody.innerHTML = top10.map(cve => `
+        <tr onclick="showCVEDetail('${cve.cve_id}')">
+            <td><span class="ats-badge ats-${(cve.ats_level||'info').toLowerCase()}">${cve.ats_score || 0}</span></td>
+            <td class="cve-id-cell">${cve.cve_id}</td>
+            <td class="cve-desc">${escHtml(truncate(cve.description, 80))}</td>
+            <td class="score-cell" style="color:${cvssColor(cve.cvss_score)}">${cve.cvss_score ?? '—'}</td>
+            <td class="score-cell">${formatEPSS(cve.epss_score)}</td>
+            <td class="tags-cell">
+                ${cve.in_kev ? '<span class="kev-tag">KEV</span>' : ''}
+                ${cve.has_poc ? '<span class="poc-tag">PoC</span>' : ''}
+                ${cve.nuclei_template ? '<span class="nuclei-tag">Nuclei</span>' : ''}
+            </td>
+        </tr>
+    `).join('');
+}
+
+// ─── Dashboard Charts ───
+function renderDashboardCharts() {
+    // Severity Distribution
+    const sevDist = state.stats?.severity_distribution || {};
+    const sevCtx = document.getElementById('chartSeverity')?.getContext('2d');
+    if (sevCtx) {
+        new Chart(sevCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Critical', 'High', 'Medium', 'Low', 'Info'],
+                datasets: [{
+                    data: [
+                        sevDist.CRITICAL || state.cves.filter(c => c.ats_level === 'CRITICAL').length,
+                        sevDist.HIGH || state.cves.filter(c => c.ats_level === 'HIGH').length,
+                        sevDist.MEDIUM || state.cves.filter(c => c.ats_level === 'MEDIUM').length,
+                        sevDist.LOW || state.cves.filter(c => c.ats_level === 'LOW').length,
+                        sevDist.INFO || state.cves.filter(c => c.ats_level === 'INFO').length,
+                    ],
+                    backgroundColor: ['#ff1744', '#ff9100', '#ffd600', '#448aff', '#64748b'],
+                    borderWidth: 0,
+                }],
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { position: 'right', labels: { color: '#94a3b8', font: { family: "'JetBrains Mono'", size: 11 } } },
+                },
+            },
+        });
+    }
+
+    // Top Vendors
+    const vendors = state.stats?.top_vendors || [];
+    const vendorCtx = document.getElementById('chartVendors')?.getContext('2d');
+    if (vendorCtx && vendors.length) {
+        new Chart(vendorCtx, {
+            type: 'bar',
+            data: {
+                labels: vendors.slice(0, 10).map(v => v.vendor),
+                datasets: [{
+                    data: vendors.slice(0, 10).map(v => v.count),
+                    backgroundColor: 'rgba(0,229,255,0.3)',
+                    borderColor: '#00e5ff',
+                    borderWidth: 1,
+                }],
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { ticks: { color: '#64748b', font: { family: "'JetBrains Mono'", size: 10 } }, grid: { color: 'rgba(42,48,66,0.5)' } },
+                    y: { ticks: { color: '#94a3b8', font: { family: "'JetBrains Mono'", size: 10 } }, grid: { display: false } },
+                },
+            },
+        });
+    }
+}
+
+// ─── CVE Feed ───
+function renderCVEFeed() {
+    let filtered = [...state.cves];
+
+    // Filter
+    if (state.cveFilter === 'kev') filtered = filtered.filter(c => c.in_kev);
+    else if (state.cveFilter === 'poc') filtered = filtered.filter(c => c.has_poc);
+    else if (state.cveFilter === 'nuclei') filtered = filtered.filter(c => c.nuclei_template);
+    else if (state.cveFilter === 'CRITICAL') filtered = filtered.filter(c => c.ats_level === 'CRITICAL');
+    else if (state.cveFilter === 'HIGH') filtered = filtered.filter(c => c.ats_level === 'HIGH');
+
+    // Search
+    if (state.cveSearch) {
+        const q = state.cveSearch.toLowerCase();
+        filtered = filtered.filter(c =>
+            (c.cve_id || '').toLowerCase().includes(q) ||
+            (c.description || '').toLowerCase().includes(q) ||
+            (c.affected_products || []).some(p => p.vendor?.toLowerCase().includes(q) || p.product?.toLowerCase().includes(q))
+        );
+    }
+
+    // Sort
+    filtered.sort((a, b) => {
+        const aVal = a[state.sortField] ?? 0;
+        const bVal = b[state.sortField] ?? 0;
+        return state.sortDir === 'desc' ? bVal - aVal : aVal - bVal;
+    });
+
+    // Paginate
+    const total = filtered.length;
+    const totalPages = Math.ceil(total / ITEMS_PER_PAGE);
+    state.cvePage = Math.min(state.cvePage, totalPages || 1);
+    const start = (state.cvePage - 1) * ITEMS_PER_PAGE;
+    const page = filtered.slice(start, start + ITEMS_PER_PAGE);
+
+    const tbody = document.getElementById('cveFeedBody');
+    if (page.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" class="empty-state">Sonuç bulunamadı.</td></tr>`;
+    } else {
+        tbody.innerHTML = page.map(cve => `
+            <tr onclick="showCVEDetail('${cve.cve_id}')">
+                <td><span class="ats-badge ats-${(cve.ats_level||'info').toLowerCase()}">${cve.ats_score || 0}</span></td>
+                <td class="cve-id-cell">${cve.cve_id}</td>
+                <td class="cve-desc">${escHtml(truncate(cve.description, 60))}</td>
+                <td class="score-cell" style="color:${cvssColor(cve.cvss_score)}">${cve.cvss_score ?? '—'}</td>
+                <td class="score-cell">${formatEPSS(cve.epss_score)}</td>
+                <td class="social-cell">${cve.social_posts || 0}p / ${cve.social_repos || 0}r</td>
+                <td class="tags-cell">
+                    ${cve.in_kev ? '<span class="kev-tag">KEV</span>' : ''}
+                    ${cve.has_poc ? '<span class="poc-tag">PoC</span>' : ''}
+                    ${cve.nuclei_template ? '<span class="nuclei-tag">Nuclei</span>' : ''}
+                </td>
+                <td>${(cve.mitre_techniques || []).slice(0,2).map(t => `<span class="mitre-tag">${t.id}</span>`).join('')}</td>
+            </tr>
+        `).join('');
+    }
+
+    renderPagination('cvePagination', state.cvePage, totalPages, (p) => {
+        state.cvePage = p;
+        renderCVEFeed();
+    });
+}
+
+// Filter buttons
+document.querySelectorAll('.filter-btn[data-filter]').forEach(btn => {
+    btn.addEventListener('click', () => {
+        document.querySelectorAll('.filter-btn[data-filter]').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        state.cveFilter = btn.dataset.filter;
+        state.cvePage = 1;
+        renderCVEFeed();
+    });
+});
+
+// Search
+document.getElementById('cveSearch')?.addEventListener('input', (e) => {
+    state.cveSearch = e.target.value;
+    state.cvePage = 1;
+    renderCVEFeed();
+});
+
+// Sort
+document.querySelectorAll('.cve-table th[data-sort]').forEach(th => {
+    th.addEventListener('click', () => {
+        const field = th.dataset.sort;
+        if (state.sortField === field) {
+            state.sortDir = state.sortDir === 'desc' ? 'asc' : 'desc';
+        } else {
+            state.sortField = field;
+            state.sortDir = 'desc';
+        }
+        renderCVEFeed();
+    });
+});
+
+// ─── IP Blacklist ───
+function renderIPBlacklist() {
+    let filtered = [...state.ips];
+
+    if (state.ipFilter !== 'all') {
+        filtered = filtered.filter(ip => (ip.categories || []).includes(state.ipFilter));
+    }
+
+    if (state.ipSearch) {
+        const q = state.ipSearch.toLowerCase();
+        filtered = filtered.filter(ip => (ip.ip || '').includes(q));
+    }
+
+    const total = filtered.length;
+    const totalPages = Math.ceil(total / ITEMS_PER_PAGE);
+    state.ipPage = Math.min(state.ipPage, totalPages || 1);
+    const start = (state.ipPage - 1) * ITEMS_PER_PAGE;
+    const page = filtered.slice(start, start + ITEMS_PER_PAGE);
+
+    const tbody = document.getElementById('ipTableBody');
+    if (page.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="4" class="empty-state">Sonuç bulunamadı.</td></tr>`;
+    } else {
+        tbody.innerHTML = page.map(ip => `
+            <tr>
+                <td class="ip-addr">${ip.ip}</td>
+                <td><span class="hit-badge ${ip.hit_count >= 5 ? 'hit-high' : ip.hit_count >= 3 ? 'hit-medium' : 'hit-low'}">${ip.hit_count}</span></td>
+                <td>${(ip.categories || []).map(c => `<span class="category-tag">${c}</span>`).join('')}</td>
+                <td style="font-size:11px;color:var(--text-muted)">${(ip.sources || []).join(', ')}</td>
+            </tr>
+        `).join('');
+    }
+
+    renderPagination('ipPagination', state.ipPage, totalPages, (p) => {
+        state.ipPage = p;
+        renderIPBlacklist();
+    });
+}
+
+document.querySelectorAll('.ip-filter').forEach(btn => {
+    btn.addEventListener('click', () => {
+        document.querySelectorAll('.ip-filter').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        state.ipFilter = btn.dataset.cat;
+        state.ipPage = 1;
+        renderIPBlacklist();
+    });
+});
+
+document.getElementById('ipSearch')?.addEventListener('input', (e) => {
+    state.ipSearch = e.target.value;
+    state.ipPage = 1;
+    renderIPBlacklist();
+});
+
+// ─── Analytics ───
+function renderAnalytics() {
+    // CWE Chart
+    const cwes = state.stats?.top_cwes || [];
+    const cweCtx = document.getElementById('chartCWE')?.getContext('2d');
+    if (cweCtx && cwes.length) {
+        if (window._cweChart) window._cweChart.destroy();
+        window._cweChart = new Chart(cweCtx, {
+            type: 'bar',
+            data: {
+                labels: cwes.slice(0, 10).map(c => c.cwe),
+                datasets: [{
+                    data: cwes.slice(0, 10).map(c => c.count),
+                    backgroundColor: 'rgba(179,136,255,0.3)',
+                    borderColor: '#b388ff',
+                    borderWidth: 1,
+                }],
+            },
+            options: {
+                responsive: true,
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { ticks: { color: '#94a3b8', font: { family: "'JetBrains Mono'", size: 10 }, maxRotation: 45 }, grid: { color: 'rgba(42,48,66,0.5)' } },
+                    y: { ticks: { color: '#64748b' }, grid: { color: 'rgba(42,48,66,0.5)' } },
+                },
+            },
+        });
+    }
+
+    // MITRE Tactics
+    const tactics = state.stats?.mitre_tactics || {};
+    const mitreCtx = document.getElementById('chartMITRE')?.getContext('2d');
+    if (mitreCtx && Object.keys(tactics).length) {
+        if (window._mitreChart) window._mitreChart.destroy();
+        const sorted = Object.entries(tactics).sort((a, b) => b[1] - a[1]);
+        window._mitreChart = new Chart(mitreCtx, {
+            type: 'bar',
+            data: {
+                labels: sorted.map(s => s[0]),
+                datasets: [{
+                    data: sorted.map(s => s[1]),
+                    backgroundColor: 'rgba(68,138,255,0.3)',
+                    borderColor: '#448aff',
+                    borderWidth: 1,
+                }],
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { ticks: { color: '#64748b' }, grid: { color: 'rgba(42,48,66,0.5)' } },
+                    y: { ticks: { color: '#94a3b8', font: { family: "'JetBrains Mono'", size: 10 } }, grid: { display: false } },
+                },
+            },
+        });
+    }
+}
+
+// ─── CVE Detail Modal ───
+function showCVEDetail(cveId) {
+    const cve = state.cves.find(c => c.cve_id === cveId);
+    if (!cve) return;
+
+    const bd = cve.ats_breakdown || {};
+
+    document.getElementById('modalContent').innerHTML = `
+        <div class="modal-cve-id">${cve.cve_id}</div>
+        <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;">
+            <span class="ats-badge ats-${(cve.ats_level||'info').toLowerCase()}">ATS: ${cve.ats_score || 0}</span>
+            ${cve.in_kev ? '<span class="kev-tag">CISA KEV</span>' : ''}
+            ${cve.has_poc ? '<span class="poc-tag">Public PoC</span>' : ''}
+            ${cve.nuclei_template ? '<span class="nuclei-tag">Nuclei Template</span>' : ''}
+        </div>
+        <div class="modal-desc">${escHtml(cve.description || 'Açıklama mevcut değil.')}</div>
+
+        <div class="modal-grid">
+            <div class="modal-metric">
+                <div class="modal-metric-label">CVSS Score</div>
+                <div class="modal-metric-value" style="color:${cvssColor(cve.cvss_score)}">${cve.cvss_score ?? '—'}</div>
+            </div>
+            <div class="modal-metric">
+                <div class="modal-metric-label">EPSS</div>
+                <div class="modal-metric-value">${formatEPSS(cve.epss_score)}</div>
+            </div>
+            <div class="modal-metric">
+                <div class="modal-metric-label">Sosyal</div>
+                <div class="modal-metric-value" style="color:var(--cyan)">${cve.social_posts || 0} post</div>
+            </div>
+            <div class="modal-metric">
+                <div class="modal-metric-label">GitHub Repos</div>
+                <div class="modal-metric-value" style="color:var(--purple)">${cve.social_repos || 0}</div>
+            </div>
+        </div>
+
+        <div class="modal-section">
+            <div class="modal-section-title">ATS Breakdown</div>
+            <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;">
+                <div style="text-align:center;">
+                    <div style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--red)">${bd.severity ?? '—'}</div>
+                    <div style="font-size:9px;color:var(--text-muted);text-transform:uppercase">Ciddiyet</div>
+                </div>
+                <div style="text-align:center;">
+                    <div style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--orange)">${bd.exploit_probability ?? '—'}</div>
+                    <div style="font-size:9px;color:var(--text-muted);text-transform:uppercase">Exploit</div>
+                </div>
+                <div style="text-align:center;">
+                    <div style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--yellow)">${bd.weaponization ?? '—'}</div>
+                    <div style="font-size:9px;color:var(--text-muted);text-transform:uppercase">Silah</div>
+                </div>
+                <div style="text-align:center;">
+                    <div style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--cyan)">${bd.social_signal ?? '—'}</div>
+                    <div style="font-size:9px;color:var(--text-muted);text-transform:uppercase">Sosyal</div>
+                </div>
+                <div style="text-align:center;">
+                    <div style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--green)">${bd.time_factor ?? '—'}</div>
+                    <div style="font-size:9px;color:var(--text-muted);text-transform:uppercase">Zaman</div>
+                </div>
+            </div>
+        </div>
+
+        ${(cve.mitre_techniques || []).length > 0 ? `
+        <div class="modal-section">
+            <div class="modal-section-title">MITRE ATT&CK Teknikleri</div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;">
+                ${cve.mitre_techniques.map(t => `<span class="mitre-tag" title="${t.tactic}">${t.id} — ${t.name}</span>`).join('')}
+            </div>
+        </div>
+        ` : ''}
+
+        ${(cve.affected_products || []).length > 0 ? `
+        <div class="modal-section">
+            <div class="modal-section-title">Etkilenen Ürünler</div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;">
+                ${cve.affected_products.slice(0,10).map(p => `<span class="category-tag">${p.vendor}/${p.product}</span>`).join('')}
+            </div>
+        </div>
+        ` : ''}
+
+        ${(cve.cwes || []).length > 0 ? `
+        <div class="modal-section">
+            <div class="modal-section-title">CWE</div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;">
+                ${cve.cwes.map(c => `<span class="badge badge-info">${c}</span>`).join('')}
+            </div>
+        </div>
+        ` : ''}
+
+        ${(cve.references || []).length > 0 ? `
+        <div class="modal-section modal-refs">
+            <div class="modal-section-title">Referanslar</div>
+            ${cve.references.slice(0,8).map(r => `<a href="${escHtml(r.url)}" target="_blank" rel="noopener">${escHtml(r.url)}</a>`).join('')}
+        </div>
+        ` : ''}
+
+        <div style="margin-top:20px;text-align:center;">
+            <a href="https://nvd.nist.gov/vuln/detail/${cve.cve_id}" target="_blank" class="export-btn">NVD'de Görüntüle →</a>
+        </div>
+    `;
+
+    document.getElementById('cveModal').classList.add('active');
+}
+
+function closeModal() {
+    document.getElementById('cveModal').classList.remove('active');
+}
+
+document.getElementById('cveModal').addEventListener('click', (e) => {
+    if (e.target === e.currentTarget) closeModal();
+});
+
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeModal();
+});
+
+// ─── Pagination ───
+function renderPagination(containerId, currentPage, totalPages, onPageChange) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+
+    if (totalPages <= 1) {
+        container.innerHTML = '';
+        return;
+    }
+
+    let html = `<button class="page-btn" ${currentPage <= 1 ? 'disabled' : ''} onclick="return false;">← Önceki</button>`;
+
+    const range = getPageRange(currentPage, totalPages);
+    for (const p of range) {
+        if (p === '...') {
+            html += `<span class="page-info">…</span>`;
+        } else {
+            html += `<button class="page-btn ${p === currentPage ? 'active' : ''}">${p}</button>`;
+        }
+    }
+
+    html += `<button class="page-btn" ${currentPage >= totalPages ? 'disabled' : ''}>Sonraki →</button>`;
+    html += `<span class="page-info">${currentPage}/${totalPages}</span>`;
+
+    container.innerHTML = html;
+
+    // Event delegation
+    container.querySelectorAll('.page-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const text = btn.textContent.trim();
+            if (text === '← Önceki' && currentPage > 1) onPageChange(currentPage - 1);
+            else if (text === 'Sonraki →' && currentPage < totalPages) onPageChange(currentPage + 1);
+            else {
+                const num = parseInt(text);
+                if (!isNaN(num)) onPageChange(num);
+            }
+        });
+    });
+}
+
+function getPageRange(current, total) {
+    if (total <= 7) return Array.from({length: total}, (_, i) => i + 1);
+    const pages = [];
+    pages.push(1);
+    if (current > 3) pages.push('...');
+    for (let i = Math.max(2, current - 1); i <= Math.min(total - 1, current + 1); i++) {
+        pages.push(i);
+    }
+    if (current < total - 2) pages.push('...');
+    pages.push(total);
+    return pages;
+}
+
+// ─── Helpers ───
+function formatNum(n) {
+    return (n || 0).toLocaleString('tr-TR');
+}
+
+function formatEPSS(val) {
+    if (!val && val !== 0) return '—';
+    return (parseFloat(val) * 100).toFixed(2) + '%';
+}
+
+function cvssColor(score) {
+    if (!score) return 'var(--text-muted)';
+    score = parseFloat(score);
+    if (score >= 9) return 'var(--red)';
+    if (score >= 7) return 'var(--orange)';
+    if (score >= 4) return 'var(--yellow)';
+    return 'var(--text-secondary)';
+}
+
+function truncate(str, len) {
+    if (!str) return '';
+    return str.length > len ? str.substring(0, len) + '…' : str;
+}
+
+function escHtml(str) {
+    if (!str) return '';
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+}
+
+// ─── Init ───
+loadData();
+</script>
+
+</body>
+</html>

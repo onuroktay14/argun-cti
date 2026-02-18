@@ -1,0 +1,24 @@
+{
+    "meta": {
+        "generated_at": "2026-02-18T12:00:00+00:00",
+        "generator": "ARGUN CTI v2.0"
+    },
+    "summary": {
+        "total_cves": 0,
+        "critical_count": 0,
+        "high_count": 0,
+        "kev_count": 0,
+        "poc_count": 0,
+        "total_ips": 0
+    },
+    "severity_distribution": {
+        "CRITICAL": 0,
+        "HIGH": 0,
+        "MEDIUM": 0,
+        "LOW": 0,
+        "INFO": 0
+    },
+    "top_vendors": [],
+    "top_cwes": [],
+    "mitre_tactics": {}
+}
