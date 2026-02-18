@@ -158,7 +158,7 @@ MIT License — Özgürce kullanabilir, değiştirebilir ve dağıtabilirsiniz.
 
 ## 👤 Geliştirici
 
-**Onur Oktay** — Senior Cyber Security Engineer  
+**Onur Oktay** — Defense Team Lead | Senior Cyber Security Expert   
 [LinkedIn](https://www.linkedin.com/in/onuroktaycom/) | [ARGUN Security](https://www.argunsec.com)
 
 ---
