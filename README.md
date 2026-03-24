@@ -1,6 +1,6 @@
 # 🛡️ ARGUN CTI — Cyber Threat Intelligence Platform
 
-**AI-Powered Threat Intelligence Dashboard by [ARGUN Security](https://www.argunsec.com)**
+**AI-Powered Threat Intelligence Dashboard by [ARGUN Security](https://onuroktay14.github.io/argun-cti/)**
 
 > Clear Vision, Absolute Security
 
